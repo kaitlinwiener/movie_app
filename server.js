@@ -1,20 +1,20 @@
 var express = require ('express'),
-    PORT = process.env.PORT || 5432,
-    server = express(),
-    MONGOURI = process.env.MONGOLAB_URI || "mongodb://localhost:27017",
-    dbname = "moviePicks",
-    mongoose = require('mongoose'),
-    morgan = require('morgan'),
-    ejs = require ('ejs'),
-    layouts = require ('express-ejs-layouts'),
-    session = require ('express-session'),
-    methodOverride = require ('method-override'),
-    bodyParser = require ('body-parser'),
-    Schema = mongoose.Schema,
-    bcrypt = require('bcryptjs'),
-    SALT_WORK_FACTOR = 10,
-    APIClinet = require('omdb-api-client'),
-    omdb = new APIClinet();
+PORT = process.env.PORT || 5432,
+server = express(),
+MONGOURI = process.env.MONGOLAB_URI || "mongodb://localhost:27017",
+dbname = "moviePicks",
+mongoose = require('mongoose'),
+morgan = require('morgan'),
+ejs = require ('ejs'),
+layouts = require ('express-ejs-layouts'),
+session = require ('express-session'),
+methodOverride = require ('method-override'),
+bodyParser = require ('body-parser'),
+Schema = mongoose.Schema,
+bcrypt = require('bcryptjs'),
+SALT_WORK_FACTOR = 10,
+APIClinet = require('omdb-api-client'),
+omdb = new APIClinet();
 
 // MONGOOSE STUFF
 
@@ -41,7 +41,7 @@ server.listen(PORT, function () {
   console.log("Server is up on port:", PORT);
 })
 
-
+//hash password before user is saved
 userSchema.pre('save', function(next) {
   var user = this;
 
@@ -59,6 +59,7 @@ userSchema.pre('save', function(next) {
   });
 });
 
+//compare password when user logs in
 userSchema.methods.comparePassword = function(candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
     if (err) return cb(err);
@@ -103,6 +104,7 @@ server.use(express.static('./public'));
 
 //ROUTES
 server.get('/', function (req, res) {
+  //if user is logged in, set the current user and render the homepage
   if (req.session.currentUser) {
     User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
       if (err) {
@@ -113,6 +115,7 @@ server.get('/', function (req, res) {
         });
       }
     })
+    //otherwise redirect to the login page
   } else {
     res.redirect(302, '/login')
   }
@@ -123,18 +126,18 @@ server.post('/movies/search/:number', function (req, res) {
   var searchTitle = req.body.search
   omdb({s: searchTitle}).list().then(function(movieResults) {
     var movieId = movieResults.search[0].imdbID
-      omdb({i:movieId}).list(function(err, specificMovie) {
-        res.render('show', {
-          results: movieResults,
-          movie: specificMovie,
-          number: req.params.number,
-          searchTitle: searchTitle
-        })
-      });
+    omdb({i:movieId}).list(function(err, specificMovie) {
+      res.render('show', {
+        results: movieResults,
+        movie: specificMovie,
+        number: req.params.number,
+        searchTitle: searchTitle
+      })
+    });
   }).catch(function(err) {
-      console.log(err);
-      req.session.flash.noMovie = "Nothing Found! Try Again";
-      res.redirect(302, '/movies/new');
+    console.log(err);
+    req.session.flash.noMovie = "Nothing Found! Try Again";
+    res.redirect(302, '/movies/new');
   });
 })
 
@@ -144,15 +147,15 @@ server.get('/movies/search/:title/:number', function (req, res) {
   searchTitle = req.params.title
   omdb({s: searchTitle}).list().then(function(movieResults) {
     var movieId = movieResults.search[number].imdbID
-      omdb({i:movieId}).list(function(err, specificMovie) {
-        console.log(specificMovie)
-        res.render('show', {
-          results: movieResults,
-          movie: specificMovie
-        })
-      });
+    omdb({i:movieId}).list(function(err, specificMovie) {
+      console.log(specificMovie)
+      res.render('show', {
+        results: movieResults,
+        movie: specificMovie
+      })
+    });
   }).catch(function(err) {
-      console.log(err);
+    console.log(err);
   });
 })
 
@@ -214,29 +217,29 @@ server.post('/session', function (req, res) {
     if (err) {
       console.log(err);
     } else {
-        if (currentUser === null) {
-          req.session.flash.userDoesntExist = "Incorrect Username";
-          res.redirect(302, '/login')
-        }  else {
-            bcrypt.compare(req.body.user.password, currentUser.password, function (err, match) {
-            if (err) {
-              console.log(err);
-            } else if (!match) {
-              req.session.flash.incorrectPassword = "Incorrect Password";
-              res.redirect(302, '/login')
-            } else {
-              req.session.currentUser = req.body.user;
-              User.find({}, function (err, users) {
-                if (err) {
-                  console.log("err")
-                } else {
-                  req.session.numUsers = users.length
-                  res.redirect(302, '/')
-                }
-              } )
-            }
+      if (currentUser === null) {
+        req.session.flash.userDoesntExist = "Incorrect Username";
+        res.redirect(302, '/login')
+      }  else {
+        bcrypt.compare(req.body.user.password, currentUser.password, function (err, match) {
+          if (err) {
+            console.log(err);
+          } else if (!match) {
+            req.session.flash.incorrectPassword = "Incorrect Password";
+            res.redirect(302, '/login')
+          } else {
+            req.session.currentUser = req.body.user;
+            User.find({}, function (err, users) {
+              if (err) {
+                console.log("err")
+              } else {
+                req.session.numUsers = users.length
+                res.redirect(302, '/')
+              }
+            } )
+          }
         })
-        }
+      }
     }
   });
 });
@@ -283,8 +286,8 @@ server.get('/pick', function (req, res) {
       var number = Math.floor(Math.random()*unwatchedMovies.length)
       var pick = unwatchedMovies[number]
       res.render('pick', {
-            movie: pick
-          })
+        movie: pick
+      })
     }
   })
 })
@@ -297,23 +300,23 @@ server.post('/movies/:id', function (req, res) {
     } else {
       currentUser.movies.forEach(function (movie, i) {
         if (movie._id == req.params.id) {
-            currentUser.movies[i].watched = true;
-            User.update(currentUser, function (err, savedUser) {
-              if (err) {
-                console.log("errrrrror")
-                console.log(err)
-              } else {
-                res.redirect(302, '/')
-              }
-            })
+          currentUser.movies[i].watched = true;
+          User.update(currentUser, function (err, savedUser) {
+            if (err) {
+              console.log("errrrrror")
+              console.log(err)
+            } else {
+              res.redirect(302, '/')
+            }
+          })
         }
       })
     }
- })
+  })
 })
 
 //signout
 server.delete('/session', function (req, res) {
-    req.session.currentUser = null;
-    res.redirect(302, '/login');
+  req.session.currentUser = null;
+  res.redirect(302, '/login');
 })
