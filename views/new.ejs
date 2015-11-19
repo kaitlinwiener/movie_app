@@ -1,5 +1,5 @@
 <h4>Search for a Movie</h4>
-<form class="createnew" action="/movies/search" method="post">
+<form class="createnew" action="/movies/search/0" method="post">
      <label for="searchtitle">Search by Title</label>
      <input id = "searchtitle"
             type = "text"
@@ -10,13 +10,9 @@
      <input type="submit" class="submit btn waves-effect waves-light"/></br></br>
     </div>
 </form>
-
-<div>
-  <% if (results != "a") { %>
-    <%= results.search[0].Title %></br>
-    <img src= "<%=results.search[0].Poster%>">
-  <% } %>
-</div>
+<% if (flash.noMovie) { %>
+<p class = "errormessage"><%=flash.noMovie%></p>
+<%} %>
 
 <h4>Or Add it Yourself</h4>
 <form class="createnew" action="/movies" method="post">
@@ -37,4 +33,4 @@
     </div>
 </form>
 
-<a href="./" class="btn-floating btn-med waves-effect waves-light grey">Back</a>
+<a href="/" class="btn-floating btn-med waves-effect waves-light grey">Back</a>

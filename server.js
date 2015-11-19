@@ -28,7 +28,9 @@ var User = mongoose.model('user', userSchema);
 
 var movieSchema = new Schema({
   title:  { type: String, required: true},
-  genre: {type: String, required: true},
+  genre: [{type: String, required: true}],
+  plot: {type: String, required: true},
+  posterUrl: {type: String},
   watched: {type: Boolean, required: true, default: false}
 }, {collections: 'movies', strict: false});
 
@@ -116,13 +118,37 @@ server.get('/', function (req, res) {
   }
 });
 
-server.post('/movies/search', function (req, res) {
+server.post('/movies/search/:number', function (req, res) {
   var searchTitle = req.body.search
   omdb({s: searchTitle}).list().then(function(movieResults) {
-      console.log(movieResults.search[0].Title)
-      res.render('new', {
-        results: movieResults
-      })
+    var movieId = movieResults.search[0].imdbID
+      omdb({i:movieId}).list(function(err, specificMovie) {
+        console.log(specificMovie)
+        res.render('show', {
+          results: movieResults,
+          movie: specificMovie,
+          number: req.params.number,
+          searchTitle: searchTitle
+        })
+      });
+  }).catch(function(err) {
+      console.log(err);
+      req.session.flash.noMovie = "Nothing Found! Try Again";
+      res.redirect(302, '/movies/new');
+  });
+})
+
+server.get('/movies/search/:title/:number', function (req, res) {
+  number = Number(req.params.number)
+  searchTitle = req.params.title
+  omdb({s: searchTitle}).list().then(function(movieResults) {
+    var movieId = movieResults.search[number].imdbID
+      omdb({i:movieId}).list(function(err, specificMovie) {
+        res.render('show', {
+          results: movieResults,
+          movie: specificMovie
+        })
+      });
   }).catch(function(err) {
       console.log(err);
   });
@@ -208,10 +234,8 @@ server.post('/session', function (req, res) {
   });
 });
 
-server.get('/movie/new', function (req, res) {
-  res.render('new', {
-    results: "a"
-  })
+server.get('/movies/new', function (req, res) {
+  res.render('new')
 })
 
 //add a new movie to the list
@@ -224,9 +248,6 @@ server.post('/movies', function (req, res) {
       console.log(err)
     } else {
       User.findOne({username: currentUser.username}, function (err, currentUser) {
-        console.log(currentUser)
-        console.log(currentUser.movies)
-        console.log(newMovie)
         currentUser.movies.push(newMovie);
         currentUser.save(function (err, pushed) {
           if (err) {
@@ -238,7 +259,6 @@ server.post('/movies', function (req, res) {
       })
     }
   })
-
 })
 
 //pick a movie at random from library
@@ -249,6 +269,7 @@ server.get('/pick', function (req, res) {
     } else {
       var number = Math.floor(Math.random()*allMovies.length)
       var pick = allMovies[number]
+      console.log(pick)
       res.render('pick', {
         movie: pick
       })
@@ -258,8 +279,6 @@ server.get('/pick', function (req, res) {
 
 //checked movie as watched
 server.post('/movies/:id', function (req, res) {
-  var id = req.session.currentUser._id
-  console.log(req.session.currentUserId)
   User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
     if (err) {
       console.log(err)
@@ -267,11 +286,10 @@ server.post('/movies/:id', function (req, res) {
       currentUser.movies.forEach(function (movie, i) {
         if (movie._id == req.params.id) {
             currentUser.movies[i].watched = true;
-            currentUser.save(function (err, savedUser) {
+            User.update(currentUser, function (err, savedUser) {
               if (err) {
                 console.log(err)
               } else {
-                console.log(savedUser)
                 res.redirect(302, '/')
               }
             })

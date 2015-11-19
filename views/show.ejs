@@ -1,0 +1,37 @@
+<div>
+    <%= movie.title %></br>
+    <%= movie.genres %></br>
+    <%= movie.plot %></br>
+    <img src= "<%=results.search[number].Poster%>">
+    <% if(results.search.length > number+1) { %>
+      <a href="/movies/search/<%=searchTitle %>/<%=number+1%>" class="btn-floating btn-large waves-effect waves-light green">Try Again!</a>
+      <% } else { %>
+        <a href="/movies/new" class="btn-floating btn-large waves-effect waves-light red">Back</a>
+      <% } %>
+      <form class="createnew" action="/movies" method="post">
+           <input id="movietitle"
+                  type="hidden"
+                  value= "<%= movie.title %>"
+                  class = "form-control"
+                  name="movie[title]"/>
+           <input id = "moviegenre"
+                  type = "hidden"
+                  name="movie[genre]"
+                  value="<%= movie.genres %>"
+                  class = "form-control">
+            <input id="movieplot"
+                   type="hidden"
+                   value= "<%= movie.plot %>"
+                   class = "form-control"
+                   name="movie[plot]"/>
+            <input id = "moviegenre"
+                   type = "hidden"
+                   name="movie[posterUrl]"
+                   value= "<%=results.search[number].Poster%>"
+                   class = "form-control">
+         <br><br>
+         <div>
+           <input type="submit" class="submit btn waves-effect waves-light"/></br></br>
+          </div>
+      </form>
+</div>
