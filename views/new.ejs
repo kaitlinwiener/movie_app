@@ -1,0 +1,40 @@
+<h4>Search for a Movie</h4>
+<form class="createnew" action="/movies/search" method="post">
+     <label for="searchtitle">Search by Title</label>
+     <input id = "searchtitle"
+            type = "text"
+            name="search"
+            class = "form-control">
+   <br><br>
+   <div>
+     <input type="submit" class="submit btn waves-effect waves-light"/></br></br>
+    </div>
+</form>
+
+<div>
+  <% if (results != "a") { %>
+    <%= results.search[0].Title %></br>
+    <img src= "<%=results.search[0].Poster%>">
+  <% } %>
+</div>
+
+<h4>Or Add it Yourself</h4>
+<form class="createnew" action="/movies" method="post">
+     <label for="movietitle">Title</label>
+     <input id="movietitle"
+            type="text"
+            class = "form-control"
+            name="movie[title]"/>
+     <br>
+     <label for="moviegenre">Genre</label>
+     <input id = "moviegenre"
+            type = "text"
+            name="movie[genre]"
+            class = "form-control">
+   <br><br>
+   <div>
+     <input type="submit" class="submit btn waves-effect waves-light"/></br></br>
+    </div>
+</form>
+
+<a href="./" class="btn-floating btn-med waves-effect waves-light grey">Back</a>

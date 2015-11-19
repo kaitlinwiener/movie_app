@@ -12,7 +12,9 @@ var express = require ('express'),
     bodyParser = require ('body-parser'),
     Schema = mongoose.Schema,
     bcrypt = require('bcryptjs'),
-    SALT_WORK_FACTOR = 10;
+    SALT_WORK_FACTOR = 10,
+    APIClinet = require('omdb-api-client'),
+    omdb = new APIClinet();
 
 // MONGOOSE STUFF
 
@@ -26,7 +28,8 @@ var User = mongoose.model('user', userSchema);
 
 var movieSchema = new Schema({
   title:  { type: String, required: true},
-  genre: [{type: String, required: true}]
+  genre: {type: String, required: true},
+  watched: {type: Boolean, required: true, default: false}
 }, {collections: 'movies', strict: false});
 
 var Movie = mongoose.model('movie', movieSchema);
@@ -97,10 +100,32 @@ server.use(express.static('./public'));
 
 
 //ROUTES
-
 server.get('/', function (req, res) {
-  res.render('home')
-  console.log(req.session.currentUser)
+  if (req.session.currentUser) {
+    User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render('home', {
+          movies: currentUser.movies
+        });
+      }
+    })
+  } else {
+    res.redirect(302, '/login')
+  }
+});
+
+server.post('/movies/search', function (req, res) {
+  var searchTitle = req.body.search
+  omdb({s: searchTitle}).list().then(function(movieResults) {
+      console.log(movieResults.search[0].Title)
+      res.render('new', {
+        results: movieResults
+      })
+  }).catch(function(err) {
+      console.log(err);
+  });
 })
 
 server.get('/login', function (req, res) {
@@ -108,7 +133,7 @@ server.get('/login', function (req, res) {
 })
 
 
-//SIGN UP
+//sign up
 server.post('/users/new', function (req, res) {
   //make sure username and password are filled out
   if (!req.body.user.password) {
@@ -149,7 +174,7 @@ server.post('/users/new', function (req, res) {
   }
 });
 
-//LOG IN
+//log in
 server.post('/session', function (req, res) {
   req.body.user.username = req.body.user.username.toLowerCase();
   User.findOne({username: req.body.user.username}, function (err, currentUser) {
@@ -182,3 +207,76 @@ server.post('/session', function (req, res) {
     }
   });
 });
+
+server.get('/movie/new', function (req, res) {
+  res.render('new', {
+    results: "a"
+  })
+})
+
+//add a new movie to the list
+server.post('/movies', function (req, res) {
+  var currentUser = req.session.currentUser
+
+  var newMovie = new Movie (req.body.movie)
+  newMovie.save(function (err, addedMovie) {
+    if (err) {
+      console.log(err)
+    } else {
+      User.findOne({username: currentUser.username}, function (err, currentUser) {
+        console.log(currentUser)
+        console.log(currentUser.movies)
+        console.log(newMovie)
+        currentUser.movies.push(newMovie);
+        currentUser.save(function (err, pushed) {
+          if (err) {
+            console.log(err)
+          } else {
+            res.redirect(302, '/')
+          }
+        })
+      })
+    }
+  })
+
+})
+
+//pick a movie at random from library
+server.get('/pick', function (req, res) {
+  Movie.find({}, function (err, allMovies) {
+    if (err) {
+      console.log(err);
+    } else {
+      var number = Math.floor(Math.random()*allMovies.length)
+      var pick = allMovies[number]
+      res.render('pick', {
+        movie: pick
+      })
+    }
+  });
+})
+
+//checked movie as watched
+server.post('/movies/:id', function (req, res) {
+  var id = req.session.currentUser._id
+  console.log(req.session.currentUserId)
+  User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
+    if (err) {
+      console.log(err)
+    } else {
+      currentUser.movies.forEach(function (movie, i) {
+        if (movie._id == req.params.id) {
+            currentUser.movies[i].watched = true;
+            currentUser.save(function (err, savedUser) {
+              if (err) {
+                console.log(err)
+              } else {
+                console.log(savedUser)
+                res.redirect(302, '/')
+              }
+            })
+        }
+      })
+    }
+ })
+})
