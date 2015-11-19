@@ -1,0 +1,237 @@
+* {
+  font-family: 'Bad Script', cursive;
+}
+
+h1 {
+  display: inline-block;
+  text-align: center;
+  width: 50%;
+  margin-left: 25%;
+  margin-top: 5px;
+  font-size: 48px;
+}
+
+#title {
+  margin-top: 10px;
+  color: maroon;
+}
+
+h2 {
+  background-color: lightgrey;
+  margin-top: 0px;
+}
+
+h3 {
+  text-align: center;
+  color: teal;
+  margin-bottom: 30px;
+}
+
+h4 {
+  margin-left: 50px;
+}
+
+h5 {
+  margin-bottom: 5px;
+  padding-bottom: 10px;
+}
+
+#suggestions {
+  color: black;
+  margin-top: 70px;
+}
+
+#links {
+  border: 2px solid maroon;
+}
+
+#links>a {
+  display: inline-block;
+  margin-left: 15%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#links>a:hover {
+
+}
+
+.brand-logo {
+  height: 50px;
+  width: 50px;
+  margin-top: 5px;
+}
+
+.createnew {
+  padding: 10px 50px;
+  border: 2px solid maroon;
+  padding-top: 10px;
+  margin-top: 20px;
+}
+
+.card-action {
+  padding-top: 0px;
+}
+
+.card {
+	width: 70%;
+	margin: 0 auto;
+	border: 2px solid sienna;
+  margin-bottom: 30px;
+}
+
+.card:hover {
+  box-shadow: 0 0 30px rgba(0,0,0,0.75);
+}
+
+.card-title {
+  font-size: 36px;
+}
+
+.question {
+  text-align: left;
+}
+
+.yellow.darken-3 {
+  margin-left: 5px;
+}
+
+.delete {
+  background-color: #F44336;
+  color: white;
+}
+
+.deletebutton {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.viewmore {
+    background-color: lightgrey;
+    margin-left: 40%;
+    padding-bottom: 10px;
+    border-radius: 10px;
+    padding: 2px 2px;
+    margin-bottom: 5px;
+    background-color: lightgrey;
+    margin-left: 40%;
+    padding-bottom: 10px;
+    border-radius: 10px;
+    padding: 2px 2px;
+    margin-bottom: 5px;
+    font-family: sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 14px;
+}
+
+.viewmore:hover {
+  background-color: sienna;
+}
+
+input {
+  background-color: #9AC0CD;
+  border: none;
+}
+
+.nav-wrapper {
+  background-color: #f5f5f5;
+}
+
+.brand-logo {
+  opacity: .75;
+}
+
+form {
+  width: 75%;
+  margin: 0 auto;
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+#submit-new-movie {
+  margin: 0 0;
+  border: none;
+  display: inline;
+}
+
+#delete {
+  position: fixed;
+  top: 2px;
+  left: 2px;
+  background-color: #f5f5f5;
+  color: maroon;
+  font-size: 14px;
+}
+
+#tryagain {
+  color: white;
+  background-color: maroon;
+}
+
+#add-button {
+  margin-left: 50px;
+}
+
+#picker-heading {
+  padding-top: 30px;
+  margin-bottom: 0px;
+}
+
+.movie-poster {
+  margin-top: 50px;
+}
+
+.waves-button-input {
+  background-color: #26a69a;
+}
+
+.waves-button-input:hover {
+  background-color: #2bbbad;
+}
+
+.btn-floating .btn-large i {
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+.btn-floating i {
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+.login {
+  display: inline-block;
+  height: 400px;
+  width: 40%;
+  margin-left: 10%;
+  margin-top: 100px;
+}
+
+.signup {
+  display: inline-block;
+  height: 400px;
+  width: 40%;
+  margin-top: 100px;
+}
+
+.login h1, .signup h1 {
+  height: 80px;
+}
+
+.loginsubmit {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background-color: maroon;
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.movie-picker {
+  margin-bottom: 10px;
+}

@@ -118,12 +118,12 @@ server.get('/', function (req, res) {
   }
 });
 
+//initially search for a movie
 server.post('/movies/search/:number', function (req, res) {
   var searchTitle = req.body.search
   omdb({s: searchTitle}).list().then(function(movieResults) {
     var movieId = movieResults.search[0].imdbID
       omdb({i:movieId}).list(function(err, specificMovie) {
-        console.log(specificMovie)
         res.render('show', {
           results: movieResults,
           movie: specificMovie,
@@ -138,12 +138,14 @@ server.post('/movies/search/:number', function (req, res) {
   });
 })
 
+//get next movie in search result array
 server.get('/movies/search/:title/:number', function (req, res) {
   number = Number(req.params.number)
   searchTitle = req.params.title
   omdb({s: searchTitle}).list().then(function(movieResults) {
     var movieId = movieResults.search[number].imdbID
       omdb({i:movieId}).list(function(err, specificMovie) {
+        console.log(specificMovie)
         res.render('show', {
           results: movieResults,
           movie: specificMovie
@@ -154,8 +156,13 @@ server.get('/movies/search/:title/:number', function (req, res) {
   });
 })
 
+//if already logged in, redirect to main page
 server.get('/login', function (req, res) {
-  res.render('login');
+  if (req.session.currentUser) {
+    res.redirect(302, '/')
+  } else {
+    res.render('login');
+  }
 })
 
 
@@ -263,18 +270,23 @@ server.post('/movies', function (req, res) {
 
 //pick a movie at random from library
 server.get('/pick', function (req, res) {
-  Movie.find({}, function (err, allMovies) {
+  User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
     if (err) {
-      console.log(err);
+      console.log(err)
     } else {
-      var number = Math.floor(Math.random()*allMovies.length)
-      var pick = allMovies[number]
-      console.log(pick)
-      res.render('pick', {
-        movie: pick
+      var unwatchedMovies = []
+      currentUser.movies.forEach (function (movie, i) {
+        if (movie.watched == false) {
+          unwatchedMovies.push(movie)
+        }
       })
+      var number = Math.floor(Math.random()*unwatchedMovies.length)
+      var pick = unwatchedMovies[number]
+      res.render('pick', {
+            movie: pick
+          })
     }
-  });
+  })
 })
 
 //checked movie as watched
@@ -288,6 +300,7 @@ server.post('/movies/:id', function (req, res) {
             currentUser.movies[i].watched = true;
             User.update(currentUser, function (err, savedUser) {
               if (err) {
+                console.log("errrrrror")
                 console.log(err)
               } else {
                 res.redirect(302, '/')
@@ -297,4 +310,10 @@ server.post('/movies/:id', function (req, res) {
       })
     }
  })
+})
+
+//signout
+server.delete('/session', function (req, res) {
+    req.session.currentUser = null;
+    res.redirect(302, '/login');
 })

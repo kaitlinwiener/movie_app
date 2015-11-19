@@ -1,0 +1,16 @@
+<div class="navbar-fixed">
+  <nav>
+    <div class="nav-wrapper">
+      <img src="http://www.movie.b-zone.ro/images/homephoto.png" class="brand-logo"/>
+      <h1 id="title" class="center">What2Watch</h1>
+    </div>
+    <% if (currentUser) { %>
+    <div class="logout">
+      <form action="/session/?_method=DELETE"
+         method="post">
+         <input id="delete" type="submit" value="Log Out">
+       </form>
+    </div>
+    <% } %>
+  </nav>
+</div>
