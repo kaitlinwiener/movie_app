@@ -106,21 +106,20 @@ server.use(express.static('./public'));
 server.get('/', function (req, res) {
   //if user is logged in, set the current user and render the homepage
 
-  res.redirect(302, '/login');
-  // if (req.session.currentUser) {
-  //   User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
-  //     if (err) {
-  //       console.log(err);
-  //     } else {
-  //       res.render('home', {
-  //         movies: currentUser.movies
-  //       });
-  //     }
-  //   })
-  //   //otherwise redirect to the login page
-  // } else {
-  //   res.redirect(302, '/login')
-  // }
+  if (req.session.currentUser) {
+    User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render('home', {
+          movies: currentUser.movies
+        });
+      }
+    })
+    //otherwise redirect to the login page
+  } else {
+    res.redirect(302, '/login')
+  }
 });
 
 //initially search for a movie
@@ -163,11 +162,11 @@ server.get('/movies/search/:title/:number', function (req, res) {
 
 //if already logged in, redirect to main page
 server.get('/login', function (req, res) {
-  if (req.session.currentUser) {
-    res.redirect(302, '/')
-  } else {
+  // if (req.session.currentUser) {
+  //   res.redirect(302, '/')
+  // } else {
     res.render('login');
-  }
+  // }
 })
 
 
