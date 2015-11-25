@@ -105,20 +105,22 @@ server.use(express.static('./public'));
 //ROUTES
 server.get('/', function (req, res) {
   //if user is logged in, set the current user and render the homepage
-  if (req.session.currentUser) {
-    User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render('home', {
-          movies: currentUser.movies
-        });
-      }
-    })
-    //otherwise redirect to the login page
-  } else {
-    res.redirect(302, '/login')
-  }
+
+  res.redirect(302, '/login');
+  // if (req.session.currentUser) {
+  //   User.findOne({username: req.session.currentUser.username}, function (err, currentUser) {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       res.render('home', {
+  //         movies: currentUser.movies
+  //       });
+  //     }
+  //   })
+  //   //otherwise redirect to the login page
+  // } else {
+  //   res.redirect(302, '/login')
+  // }
 });
 
 //initially search for a movie
